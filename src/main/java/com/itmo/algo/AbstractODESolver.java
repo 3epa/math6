@@ -20,18 +20,9 @@ public abstract class AbstractODESolver implements ODESolver {
 
     @Override
     public List<DataPoint> solve(FunctionDTO functionDTO, double y0, double start, double end, double h, double epsilon) throws IncorrectInputException {
-        validateParameters(start, end, h, epsilon);
-
         return computeSolution(functionDTO, y0, start, end, h, epsilon);
     }
 
-
-    protected void validateParameters(double start, double end, double h, double epsilon) throws IncorrectInputException {
-        if (h <= 0) throw new IncorrectInputException("Шаг h должен быть положительным");
-
-        if (epsilon <= 0) throw new IncorrectInputException("Погрешность epsilon должна быть положительной");
-        if (start >= end) throw new IncorrectInputException("Конец рассматриваемого отрезка должен быть больше начала");
-    }
     public String getName() {
         return name;
     }
