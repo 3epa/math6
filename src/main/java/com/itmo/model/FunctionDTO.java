@@ -1,14 +1,16 @@
 package com.itmo.model;
 
+import com.itmo.utils.TriFunction;
+
 import java.util.function.BiFunction;
-import java.util.function.Function;
+
 
 public class FunctionDTO {
     private final String name;
     private final BiFunction<Double, Double, Double> function;
-    private final Function<Double, Double> exactFunction;
+    private final TriFunction<Double, Double, Double, Double> exactFunction;
 
-    public FunctionDTO(String name, BiFunction<Double, Double, Double> function, Function<Double, Double> exactFunction) {
+    public FunctionDTO(String name, BiFunction<Double, Double, Double> function, TriFunction<Double, Double, Double, Double> exactFunction) {
         this.name = name;
         this.function = function;
         this.exactFunction = exactFunction;
@@ -22,7 +24,7 @@ public class FunctionDTO {
         return function;
     }
 
-    public Function<Double, Double> getExactFunction() {
+    public TriFunction<Double, Double, Double, Double> getExactFunction() {
         return exactFunction;
     }
 }

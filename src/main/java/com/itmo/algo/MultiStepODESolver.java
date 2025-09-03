@@ -4,6 +4,7 @@ import com.itmo.exceptions.IncorrectInputException;
 import com.itmo.model.DataPoint;
 import com.itmo.model.FunctionDTO;
 import com.itmo.utils.MathUtils;
+import com.itmo.utils.TriFunction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,14 +21,13 @@ public abstract class MultiStepODESolver extends AbstractODESolver {
     @Override
     protected List<DataPoint> computeSolution(FunctionDTO functionDTO, double y0, double start, double end, double h, double epsilon) throws IncorrectInputException {
         BiFunction<Double, Double, Double> function = functionDTO.getFunction();
-        Function<Double, Double> exactFunction = functionDTO.getExactFunction();
-
+        TriFunction<Double, Double, Double, Double> exactFunction = functionDTO.getExactFunction();
 
         List<Double> xList = MathUtils.createGrid(start, end, h);
         List<DataPoint> dataPointList = compute(function, xList, y0);
         List<DataPoint> dataPointExactList = new ArrayList<>();
         for (Double x : xList) {
-            dataPointExactList.add(new DataPoint(x, exactFunction.apply(x)));
+            dataPointExactList.add(new DataPoint(x, exactFunction.apply(x, xList.getFirst(), y0)));
         }
         if (checkEndRequirements(dataPointList, dataPointExactList, epsilon)) {
             return dataPointList;
