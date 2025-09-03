@@ -13,7 +13,8 @@ public abstract class OneStepODESolver extends AbstractODESolver {
 
     private final int order;
 
-    protected OneStepODESolver(int order) {
+    protected OneStepODESolver(String name, int order) {
+        super(name);
         this.order = order;
     }
 

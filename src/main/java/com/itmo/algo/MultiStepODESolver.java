@@ -11,6 +11,10 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public abstract class MultiStepODESolver extends AbstractODESolver {
+    public MultiStepODESolver(String name) {
+        super(name);
+    }
+
     protected abstract List<DataPoint> compute(BiFunction<Double, Double, Double> function, List<Double> xList, double y0);
 
     @Override
@@ -22,7 +26,7 @@ public abstract class MultiStepODESolver extends AbstractODESolver {
         List<Double> xList = MathUtils.createGrid(start, end, h);
         List<DataPoint> dataPointList = compute(function, xList, y0);
         List<DataPoint> dataPointExactList = new ArrayList<>();
-        for (Double x: xList) {
+        for (Double x : xList) {
             dataPointExactList.add(new DataPoint(x, exactFunction.apply(x)));
         }
         if (checkEndRequirements(dataPointList, dataPointExactList, epsilon)) {

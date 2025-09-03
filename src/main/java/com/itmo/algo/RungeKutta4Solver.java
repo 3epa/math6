@@ -10,7 +10,7 @@ public class RungeKutta4Solver extends OneStepODESolver {
     private final static int ORDER = 4;
 
     public RungeKutta4Solver() {
-        super(ORDER);
+        super("Метод Рунге-Кутты 4 порядка",ORDER);
     }
 
     @Override

@@ -8,6 +8,11 @@ import java.util.List;
 
 
 public abstract class AbstractODESolver implements ODESolver {
+    protected final String name;
+
+    public AbstractODESolver(String name) {
+        this.name = name;
+    }
 
     protected abstract List<DataPoint> computeSolution(FunctionDTO functionDTO, double y0, double start, double end, double h, double epsilon) throws IncorrectInputException;
 
@@ -26,5 +31,8 @@ public abstract class AbstractODESolver implements ODESolver {
 
         if (epsilon <= 0) throw new IncorrectInputException("Погрешность epsilon должна быть положительной");
         if (start >= end) throw new IncorrectInputException("Конец рассматриваемого отрезка должен быть больше начала");
+    }
+    public String getName() {
+        return name;
     }
 }

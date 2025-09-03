@@ -10,7 +10,7 @@ public class ImprovedEulerMethod extends OneStepODESolver {
     private static final int ORDER = 2;
 
     public ImprovedEulerMethod() {
-        super(ORDER);
+        super("Модифицированный метод Эйлера", ORDER);
     }
 
     @Override

@@ -11,6 +11,10 @@ public class AdamsSolver extends MultiStepODESolver {
     private static final double EPSILON = 0.001;
     private static final int MAX_ITERATIONS = 100;
 
+    public AdamsSolver() {
+        super("Метод Адамса");
+    }
+
     @Override
     protected List<DataPoint> compute(BiFunction<Double, Double, Double> function, List<Double> xList, double y0) {
         RungeKutta4Solver solver = new RungeKutta4Solver();
