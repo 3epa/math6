@@ -37,7 +37,7 @@ public class AdamsSolver extends MultiStepODESolver {
             double yNext = yPredictor;
             int iteration = 0;
             while (true) {
-                double yCorrector = dataPointList.get(i).getY() + h / 24 * (9 * function.apply(xList.get(i), yNext) + 19 * f0 - 5 * f1 + f2);
+                double yCorrector = dataPointList.get(i).getY() + h / 24 * (9 * function.apply(xList.get(i+1), yNext) + 19 * f0 - 5 * f1 + f2);
                 if (Math.abs(yNext - yCorrector) < EPSILON || iteration >= MAX_ITERATIONS) {
                     yNext = yCorrector;
                     break;
