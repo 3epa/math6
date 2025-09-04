@@ -7,19 +7,19 @@ import java.util.List;
 
 public class MathUtils {
 
-    private final static double EPSILON = 0.0001;
+    private final static double EPSILON = 1e-8;
 
     public static List<Double> createGrid(double start, double end, double h) throws IncorrectInputException {
         List<Double> grid = new ArrayList<>();
-        int steps = (int) Math.ceil((end - start) / h);
-        for (int i = 0; i < steps; i++) {
-            double x = start + i * h;
-            grid.add(x);
-        }
-        if (Math.abs(end - (grid.getLast() + h)) < EPSILON) {
-            grid.add(end);
-        } else {
+        int n = (int) Math.round((end - start) / h);
+        double actualStep = (end - start) / n;
+
+        if (Math.abs(actualStep - h) > EPSILON) {
             throw new IncorrectInputException("Текущий шаг не позволяет составить равномерную сетку, попробуйте выбрать другой");
+        }
+
+        for (int i = 0; i <= n; i++) {
+            grid.add(start + i * actualStep);
         }
         return grid;
     }
