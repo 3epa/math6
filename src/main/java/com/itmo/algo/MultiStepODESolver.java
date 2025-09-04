@@ -16,7 +16,7 @@ public abstract class MultiStepODESolver extends AbstractODESolver {
         super(name);
     }
 
-    protected abstract List<DataPoint> compute(BiFunction<Double, Double, Double> function, List<Double> xList, double y0);
+    protected abstract List<DataPoint> compute(BiFunction<Double, Double, Double> function, List<Double> xList, double y0) throws IncorrectInputException;
 
     @Override
     protected List<DataPoint> computeSolution(FunctionDTO functionDTO, double y0, double start, double end, double h, double epsilon) throws IncorrectInputException {

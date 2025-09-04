@@ -1,5 +1,6 @@
 package com.itmo.algo;
 
+import com.itmo.exceptions.IncorrectInputException;
 import com.itmo.model.DataPoint;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public class ImprovedEulerMethod extends OneStepODESolver {
     }
 
     @Override
-    public List<DataPoint> compute(BiFunction<Double, Double, Double> function, List<Double> xList, double y0) {
+    public List<DataPoint> compute(BiFunction<Double, Double, Double> function, List<Double> xList, double y0) throws IncorrectInputException {
         List<DataPoint> result = new ArrayList<>();
         result.add(new DataPoint(xList.getFirst(), y0));
 
@@ -26,6 +27,9 @@ public class ImprovedEulerMethod extends OneStepODESolver {
 
             double yPredictor = yPrev + h * function.apply(xPrev, yPrev);
             double yCorrector = yPrev + h / 2 * (function.apply(xPrev, yPrev) + function.apply(xPrev + h, yPredictor));
+            if (Double.isNaN(yCorrector) || Double.isInfinite(yCorrector)) {
+                throw new IncorrectInputException("Не удалось применить метод на данном интервале, попробуйте выбрать другой");
+            }
             result.add(new DataPoint(xList.get(i + 1), yCorrector));
         }
         return result;

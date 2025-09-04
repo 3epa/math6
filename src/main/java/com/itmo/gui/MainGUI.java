@@ -194,9 +194,10 @@ public class MainGUI extends JFrame {
                     return;
                 }
 
+                output.append(String.format("%-20s %-20s\n", "X", "Y"));
                 List<DataPoint> dataPointList = odeSolver.solve(functionDTO, y0, start, end, step, epsilon);
                 for (DataPoint dataPoint: dataPointList) {
-                    output.append(dataPoint.getX()).append(" ").append(dataPoint.getY()).append("\n");
+                    output.append(String.format("%-20f %-20f\n", dataPoint.getX(), dataPoint.getY()));
                 }
             } catch (IncorrectInputException e) {
                 output.append("Статус: ОШИБКА\n");

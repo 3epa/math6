@@ -1,5 +1,6 @@
 package com.itmo.algo;
 
+import com.itmo.exceptions.IncorrectInputException;
 import com.itmo.model.DataPoint;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public class RungeKutta4Solver extends OneStepODESolver {
     }
 
     @Override
-    protected List<DataPoint> compute(BiFunction<Double, Double, Double> function, List<Double> xList, double y0) {
+    protected List<DataPoint> compute(BiFunction<Double, Double, Double> function, List<Double> xList, double y0) throws IncorrectInputException {
         List<DataPoint> result = new ArrayList<>();
         result.add(new DataPoint(xList.getFirst(), y0));
 
@@ -29,6 +30,9 @@ public class RungeKutta4Solver extends OneStepODESolver {
             double k3 = h * function.apply(xPrev + h / 2, yPrev + k2 / 2);
             double k4 = h * function.apply(xPrev + h, yPrev + k3);
             double yNext = yPrev + (k1 + 2 * k2 + 2 * k3 + k4) / 6;
+            if (Double.isNaN(yNext) || Double.isInfinite(yNext)) {
+                throw new IncorrectInputException("Не удалось применить метод на данном интервале, попробуйте выбрать другой");
+            }
             result.add(new DataPoint(xList.get(i + 1), yNext));
         }
 
