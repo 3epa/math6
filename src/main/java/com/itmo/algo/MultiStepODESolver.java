@@ -9,7 +9,6 @@ import com.itmo.utils.TriFunction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public abstract class MultiStepODESolver extends AbstractODESolver {
     public MultiStepODESolver(String name) {

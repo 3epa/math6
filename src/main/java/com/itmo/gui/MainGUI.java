@@ -195,6 +195,7 @@ public class MainGUI extends JFrame {
             output.append(String.format("%s:\n", odeSolver.getName()));
             try {
                 List<DataPoint> dataPointList = odeSolver.solve(functionDTO, y0, start, end, step, epsilon);
+                output.append("Метод сошелся за ").append(dataPointList.size()).append(" шагов.\n");
                 output.append(String.format("%-20s %-20s\n", "X", "Y"));
                 for (DataPoint dataPoint : dataPointList) {
                     output.append(String.format("%-20f %-20f\n", dataPoint.getX(), dataPoint.getY()));
@@ -272,8 +273,6 @@ public class MainGUI extends JFrame {
             chartPanel.setChart(chart);
             chartPanel.repaint();
 
-        } catch (Exception e) {
-            System.err.println("Ошибка при обновлении графика: " + e.getMessage());
-        }
+        } catch (Exception ignored) {}
     }
 }
