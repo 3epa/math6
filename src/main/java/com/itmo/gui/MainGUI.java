@@ -1,7 +1,6 @@
 package com.itmo.gui;
 
 import com.itmo.algo.AbstractODESolver;
-import com.itmo.algo.ODESolver;
 import com.itmo.exceptions.IncorrectInputException;
 import com.itmo.model.DataPoint;
 import com.itmo.model.FunctionDTO;
@@ -20,7 +19,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 public class MainGUI extends JFrame {
 
