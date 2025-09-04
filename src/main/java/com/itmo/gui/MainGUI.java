@@ -5,6 +5,7 @@ import com.itmo.algo.ODESolver;
 import com.itmo.exceptions.IncorrectInputException;
 import com.itmo.model.DataPoint;
 import com.itmo.model.FunctionDTO;
+import com.itmo.utils.MathUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -153,50 +154,49 @@ public class MainGUI extends JFrame {
     }
 
     private void processInput() {
-        updateOutput();
-        updateChart();
+        double y0 = Double.parseDouble(y0Field.getText().replace(",", "."));
+        double start = Double.parseDouble(startIntervalField.getText().replace(",", "."));
+        double end = Double.parseDouble(endIntervalField.getText().replace(",", "."));
+        double step = Double.parseDouble(stepField.getText().replace(",", "."));
+        double epsilon = Double.parseDouble(epsilonField.getText().replace(",", "."));
+
+        if (start >= end) {
+            JOptionPane.showMessageDialog(this, "Начало интервала должно быть меньше конца", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (step <= 0) {
+            JOptionPane.showMessageDialog(this, "Шаг должен быть положительным", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (epsilon <= 0) {
+            JOptionPane.showMessageDialog(this, "Точность должен быть положительным", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String selectedFunction = (String) functionComboBox.getSelectedItem();
+        FunctionDTO functionDTO = null;
+        for (FunctionDTO aFunctionDTO : functions) {
+            if (aFunctionDTO.getName().equals(selectedFunction)) {
+                functionDTO = aFunctionDTO;
+            }
+        }
+
+        if (functionDTO == null) {
+            JOptionPane.showMessageDialog(this, "Неизвестная функция", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        updateOutput(functionDTO, y0, start, end, step, epsilon);
+        updateChart(functionDTO, y0, start, end, step, epsilon);
     }
 
-    private void updateOutput() {
+    private void updateOutput(FunctionDTO functionDTO, double y0, double start, double end, double step, double epsilon) {
         StringBuilder output = new StringBuilder();
         for (AbstractODESolver odeSolver : odeSolvers) {
             output.append(String.format("%s:\n", odeSolver.getName()));
             try {
-                double y0 = Double.parseDouble(y0Field.getText().replace(",", "."));
-                double start = Double.parseDouble(startIntervalField.getText().replace(",", "."));
-                double end = Double.parseDouble(endIntervalField.getText().replace(",", "."));
-                double step = Double.parseDouble(stepField.getText().replace(",", "."));
-                double epsilon = Double.parseDouble(epsilonField.getText().replace(",", "."));
-
-                if (start >= end) {
-                    JOptionPane.showMessageDialog(this, "Начало интервала должно быть меньше конца", "Ошибка", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                if (step <= 0) {
-                    JOptionPane.showMessageDialog(this, "Шаг должен быть положительным", "Ошибка", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                if (epsilon <= 0) {
-                    JOptionPane.showMessageDialog(this, "Точность должен быть положительным", "Ошибка", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                String selectedFunction = (String) functionComboBox.getSelectedItem();
-                FunctionDTO functionDTO = null;
-                for (FunctionDTO aFunctionDTO : functions) {
-                    if (aFunctionDTO.getName().equals(selectedFunction)) {
-                        functionDTO = aFunctionDTO;
-                    }
-                }
-
-                if (functionDTO == null) {
-                    JOptionPane.showMessageDialog(this, "Неизвестная функция", "Ошибка", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                output.append(String.format("%-20s %-20s\n", "X", "Y"));
                 List<DataPoint> dataPointList = odeSolver.solve(functionDTO, y0, start, end, step, epsilon);
-                for (DataPoint dataPoint: dataPointList) {
+                output.append(String.format("%-20s %-20s\n", "X", "Y"));
+                for (DataPoint dataPoint : dataPointList) {
                     output.append(String.format("%-20f %-20f\n", dataPoint.getX(), dataPoint.getY()));
                 }
             } catch (IncorrectInputException e) {
@@ -212,7 +212,68 @@ public class MainGUI extends JFrame {
         outputArea.setCaretPosition(0);
     }
 
-    private void updateChart() {
+    private void updateChart(FunctionDTO functionDTO, double y0, double start, double end, double step, double epsilon) {
+        try {
+            XYSeriesCollection dataset = new XYSeriesCollection();
 
+            XYSeries exactSeries = new XYSeries("Точное решение");
+            List<Double> xList = MathUtils.createGrid(start, end, step);
+            for (Double x : xList) {
+                Double yExact = functionDTO.getExactFunction().apply(x, start, y0);
+                exactSeries.add(x, yExact);
+            }
+            dataset.addSeries(exactSeries);
+
+            for (AbstractODESolver odeSolver : odeSolvers) {
+                try {
+                    List<DataPoint> dataPointList = odeSolver.solve(functionDTO, y0, start, end, step, epsilon);
+                    XYSeries series = new XYSeries(odeSolver.getName());
+
+                    for (DataPoint dataPoint : dataPointList) {
+                        series.add(dataPoint.getX(), dataPoint.getY());
+                    }
+
+                    dataset.addSeries(series);
+                } catch (Exception ignored) {
+                }
+            }
+
+            String selectedFunction = (String) functionComboBox.getSelectedItem();
+            JFreeChart chart = ChartFactory.createXYLineChart(
+                    "Решение ОДУ: " + "y' = " + selectedFunction,
+                    "X",
+                    "Y",
+                    dataset,
+                    PlotOrientation.VERTICAL,
+                    true,
+                    true,
+                    false
+            );
+
+            XYPlot plot = chart.getXYPlot();
+            XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+
+            renderer.setSeriesPaint(0, Color.BLACK);
+            renderer.setSeriesPaint(1, Color.RED);
+            renderer.setSeriesPaint(2, Color.BLUE);
+            renderer.setSeriesPaint(3, Color.GREEN);
+
+            renderer.setSeriesStroke(0, new BasicStroke(
+                    2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
+                    1.0f, new float[]{6.0f, 6.0f}, 0.0f
+            ));
+
+            for (int i = 1; i < dataset.getSeriesCount(); i++) {
+                renderer.setSeriesStroke(i, new BasicStroke((float ) 2.0 + i * 5));
+            }
+
+            plot.setRenderer(renderer);
+
+            chartPanel.setChart(chart);
+            chartPanel.repaint();
+
+        } catch (Exception e) {
+            System.err.println("Ошибка при обновлении графика: " + e.getMessage());
+        }
     }
 }
