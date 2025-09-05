@@ -152,12 +152,21 @@ public class MainGUI extends JFrame {
     }
 
     private void processInput() {
-        double y0 = Double.parseDouble(y0Field.getText().replace(",", "."));
-        double start = Double.parseDouble(startIntervalField.getText().replace(",", "."));
-        double end = Double.parseDouble(endIntervalField.getText().replace(",", "."));
-        double step = Double.parseDouble(stepField.getText().replace(",", "."));
-        double epsilon = Double.parseDouble(epsilonField.getText().replace(",", "."));
-
+        double y0;
+        double start;
+        double end;
+        double step;
+        double epsilon;
+        try {
+            y0 = Double.parseDouble(y0Field.getText().replace(",", "."));
+            start = Double.parseDouble(startIntervalField.getText().replace(",", "."));
+            end = Double.parseDouble(endIntervalField.getText().replace(",", "."));
+            step = Double.parseDouble(stepField.getText().replace(",", "."));
+            epsilon = Double.parseDouble(epsilonField.getText().replace(",", "."));
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Неверный формат чисел", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         if (start >= end) {
             JOptionPane.showMessageDialog(this, "Начало интервала должно быть меньше конца", "Ошибка", JOptionPane.ERROR_MESSAGE);
             return;
@@ -183,6 +192,7 @@ public class MainGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Неизвестная функция", "Ошибка", JOptionPane.ERROR_MESSAGE);
             return;
         }
+
         updateOutput(functionDTO, y0, start, end, step, epsilon);
         updateChart(functionDTO, y0, start, end, step, epsilon);
     }
@@ -201,8 +211,6 @@ public class MainGUI extends JFrame {
             } catch (IncorrectInputException e) {
                 output.append("Статус: ОШИБКА\n");
                 output.append(e.getMessage()).append("\n");
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Неверный формат чисел", "Ошибка", JOptionPane.ERROR_MESSAGE);
             }
             output.append("----------------------------------------\n");
         }
@@ -263,7 +271,7 @@ public class MainGUI extends JFrame {
             ));
 
             for (int i = 1; i < dataset.getSeriesCount(); i++) {
-                renderer.setSeriesStroke(i, new BasicStroke((float ) 2.0 + i * 5));
+                renderer.setSeriesStroke(i, new BasicStroke((float) 2.0 + i * 5));
             }
 
             plot.setRenderer(renderer);
@@ -271,6 +279,7 @@ public class MainGUI extends JFrame {
             chartPanel.setChart(chart);
             chartPanel.repaint();
 
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 }
